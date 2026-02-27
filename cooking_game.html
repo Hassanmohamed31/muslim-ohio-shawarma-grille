@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Shawarma Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f3eac2;
+            color: #5d4037;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body {
+            padding: 8px;
+        }
+
+        /* MAIN CONTAINER THAT SCALES TO SCREEN */
+        .game-wrapper {
+            width: 100vw;
+            max-width: 1000px;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* FLEX ROW ON LANDSCAPE */
+        .game-container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 100%;
+            border: 8px solid #a1887f;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.2);
+            background-color: #fffde7;
+            overflow: hidden;
+        }
+
+        .station {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .grill-station {
+            flex: 0 0 45%;
+            border-right: 4px dashed #bcaaa4;
+        }
+
+        .prep-assembly-station {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .station-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #ef6c00;
+            text-shadow: 2px 2px #8d6e63;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .shawarma-spit-container {
+            position: relative;
+            margin: 5px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        #cooking-progress-bar-container {
+            width: 180px;
+            height: 12px;
+            background-color: #e0e0e0;
+            border: 1px solid #757575;
+            border-radius: 4px;
+            margin-bottom: 3px;
+            overflow: hidden;
+            display: none;
+        }
+
+        #cooking-progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #ffc107;
+            transition: width 0.1s linear;
+        }
+
+        .shawarma-spit-area {
+            width: 180px;
+            height: 260px;
+            background-color: #cfd8dc;
+            border: 3px solid #90a4ae;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        #meat-stack {
+            width: 70%;
+            height: 0%;
+            background: linear-gradient(to bottom, #a1887f 20%, #795548 80%);
+            border-radius: 5px 5px 0 0;
+            transition: height 0.3s ease-out, background-color 0.2s linear, background 0.2s linear;
+        }
+
+        #meat-stack.cooked {
+            background: #d2691e;
+        }
+
+        .spit-base {
+            width: 200px;
+            height: 25px;
+            background-color: #607d8b;
+            border-radius: 5px;
+            margin-top: -2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 5;
+        }
+
+        #meat-shaver {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 35px;
+            background-color: #e53935;
+            border: 2px solid #b71c1c;
+            border-radius: 4px 4px 15px 15px;
+            cursor: grab;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            padding-top: 1px;
+        }
+
+        #meat-shaver .shaver-icon {
+            font-size: 0.9rem;
+        }
+
+        #meat-shaver .shaver-text {
+            font-size: 0.45rem;
+            line-height: 1;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        #meat-shaver:active {
+            cursor: grabbing;
+            background-color: #d32f2f;
+        }
+
+        #meat-collection-plate {
+            width: 150px;
+            min-height: 40px;
+            background-color: #bdbdbd;
+            border: 2px solid #757575;
+            border-radius: 15px 15px 4px 4px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 4px;
+            gap: 4px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+
+        .plate-meat-portion {
+            width: 30px;
+            height: 18px;
+            background-color: #c6723B;
+            border: 1px solid #8D5524;
+            border-radius: 50%;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            color: white;
+        }
+
+        #plate-info-text {
+            width: 100%;
+            text-align: center;
+            font-size: 0.6rem;
+            color: #424242;
+            margin-top: 1px;
+        }
+
+        .game-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #ff9800;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e65100;
+            box-shadow: 0 4px #bf360c;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            transition: all 0.1s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .game-button i {
+            margin-right: 6px;
+        }
+
+        .game-button:hover:not(:disabled) {
+            background-color: #fb8c00;
+            box-shadow: 0 3px #bf360c;
+            transform: translateY(1px);
+        }
+
+        .game-button:active:not(:disabled) {
+            background-color: #f57c00;
+            box-shadow: 0 1px #bf360c;
+            transform: translateY(2px);
+        }
+
+        .game-button:disabled {
+            background-color: #9e9e9e;
+            box-shadow: 0 4px #616161;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .controls-cluster {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .customer-queue-area {
+            width: 100%;
+            min-height: 120px;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 5px;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+
+        .active-customer-slot,
+        .waiting-customer-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .active-customer-slot {
+            min-height: 90px;
+        }
+
+        /* Ensure enough space for bubble */
+        .waiting-customer-slot {
+            min-height: 60px;
+            opacity: 0.7;
+        }
+
+        .waiting-customer-slot .speech-bubble {
+            display: none !important;
+        }
+
+        .customer-character {
+            font-size: 2.8rem;
+            background-color: #ffeb3b;
+            border-radius: 50%;
+            padding: 3px;
+            border: 2px solid #fbc02d;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+            /* Space for patience bar */
+        }
+
+        .waiting-customer-slot .customer-character {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            bottom: 100%;
+            /* Start from the top of the .customer-character div */
+            left: 50%;
+            transform: translateX(-50%) translateY(-3px);
+            /* Move it up by 3px for cushion */
+            background-color: white;
+            border: 2px solid #795548;
+            border-radius: 10px;
+            padding: 5px 8px;
+            min-width: 60px;
+            max-width: 150px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+            display: none;
+            /* JS controls visibility */
+            flex-wrap: wrap;
+            gap: 3px;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid white;
+            filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.1));
+        }
+
+        .speech-bubble .order-emoji {
+            font-size: 1rem;
+        }
+
+        .patience-bar-container {
+            width: 50px;
+            height: 8px;
+            background-color: #e0e0e0;
+            border: 1px solid #757575;
+            border-radius: 3px;
+            overflow: hidden;
+            position: absolute;
+            top: 100%;
+            /* Start from the bottom of the .customer-character div */
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 3px;
+            /* 3px cushion below character */
+        }
+
+        .patience-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.2s linear;
+        }
+
+        .toppings-area {
+            width: 100%;
+            background-color: #fff9c4;
+            border: 2px dashed #ffb74d;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 6px;
+            text-align: center;
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 100px;
+        }
+
+        .assembly-container {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 6px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .area-subtitle {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #d84315;
+            text-align: center;
+        }
+
+        .toppings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 5px;
+            margin-top: 4px;
+        }
+
+        .topping-item {
+            background-color: #ffffff;
+            border: 2px solid #ffcc80;
+            border-radius: 8px;
+            padding: 5px;
+            cursor: grab;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+        }
+
+        .topping-item .emoji {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .topping-item .topping-name {
+            display: none;
+        }
+
+        .topping-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+        }
+
+        .topping-item:active {
+            cursor: grabbing;
+        }
+
+        #currentShawarma {
+            background-color: #ECEFF1;
+            border: 4px solid #B0BEC5;
+            border-radius: 50% / 30%;
+            min-height: 70px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            width: 90%;
+            max-width: 220px;
+        }
+
+        .assembled-item {
+            background-color: #ffe0b2;
+            color: #795548;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #e6a251;
+        }
+
+        .assembled-item .emoji {
+            margin-right: 2px;
+            font-size: 0.75rem;
+        }
+
+        #shaved-meat-display {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: #bf360c;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #66bb6a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            z-index: 1001;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out, top 0.1s ease-in-out;
+
+        }
+
+        .message-box.show {
+            display: block;
+            opacity: 1;
+            top: 15px;
+        }
+
+        .message-box.error {
+            background-color: #ef5350;
+        }
+
+        #game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            text-align: center;
+        }
+
+        #game-over-modal h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #ff5252;
+            text-shadow: 2px 2px black;
+        }
+
+        #game-over-modal p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        #restartGameButton {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #388E3C;
+            box-shadow: 0 4px #2E7D32;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        #pauseButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1500;
+        }
+
+        #pauseOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1400;
+            color: white;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        @media screen and (orientation: portrait) {
+            .game-container {
+                flex-direction: column;
+                height: auto;
+                max-height: none;
+            }
+
+            .station {
+                overflow-y: visible;
+            }
+
+            .grill-station {
+                flex-basis: auto;
+                width: 100%;
+                border-right: none;
+                border-bottom: 4px dashed #bcaaa4;
+                padding-bottom: 20px;
+            }
+
+            .prep-assembly-station {
+                flex-basis: auto;
+                width: 100%;
+            }
+
+            .customer-queue-area {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .toppings-area {
+                flex-grow: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-wrapper">
+        <div class="game-container">
+            <div class="station grill-station">
+                <h2 class="station-title">SHAWARMA GRILL</h2>
+                <div class="shawarma-spit-container">
+                    <div id="cooking-progress-bar-container">
+                        <div id="cooking-progress-bar"></div>
+                    </div>
+                    <div class="shawarma-spit-area" id="shawarma-spit-interaction-area">
+                        <div id="meat-stack"></div>
+                        <div id="meat-shaver">
+                            <i class="fas fa-utensils shaver-icon"></i><span class="shaver-text">SHAVE</span>
+                        </div>
+                    </div>
+                    <div class="spit-base"></div>
+                    <div id="meat-collection-plate"><span id="plate-info-text">Plate Empty</span></div>
+                </div>
+                <div class="controls-cluster">
+                    <button id="addMeatButton" class="game-button"><i class="fas fa-drumstick-bite"></i> Add
+                        Meat</button>
+                    <button id="cookMeatButton" class="game-button"><i class="fas fa-fire"></i> Cook Layer</button>
+                </div>
+                <div id="shaved-meat-display">Total Meat Stock: 0g</div>
+            </div>
+
+            <div class="station prep-assembly-station">
+                <div class="customer-queue-area" id="customer-queue-display">
+                </div>
+                <div class="toppings-area">
+                    <h3 class="area-subtitle">Toppings (Drag to Shawarma)</h3>
+                    <div id="toppingsGrid" class="toppings-grid"></div>
+                </div>
+                <div class="assembly-container">
+                    <h3 class="area-subtitle">Your Shawarma Plate</h3>
+                    <div id="currentShawarma">
+                        <p class="text-gray-400 text-xs p-1" id="plate-placeholder-text">Drag items here...</p>
+                    </div>
+                </div>
+                <button id="serveButton" class="game-button mt-auto mb-1">
+                    <i class="fas fa-concierge-bell"></i> Serve Order!
+                </button>
+            </div>
+        </div>
+        <button id="pauseButton" class="game-button"><i class="fas fa-pause"></i> Pause</button>
+        <div id="pauseOverlay">PAUSED</div>
+    </div>
+    <div id="messageBox" class="message-box">Message goes here</div>
+    <div id="game-over-modal">
+        <div>
+            <h2>GAME OVER!</h2>
+            <p id="finalScoreText">Too many customers left!</p>
+            <button id="restartGameButton">Restart Game</button>
+        </div>
+    </div>
+
+    <script>
+        const gameState = {
+            meatLevel: 0, maxMeatLevel: 100, meatIncrement: 10, isCooked: false, isCooking: false,
+            cookingProgress: 0, cookTime: 6000, cookingInterval: null, cookingStartTime: 0, cookingTimeElapsedBeforePause: 0,
+            shavedMeatStock: 0, shaveAmount: 50, meatCapacityPerCookCycle: 250, meatShavedThisCycle: 0,
+            activeCustomer: null,
+            customerQueue: [],
+            customersLost: 0,
+            maxCustomersLost: 3,
+            customerDefaultPatience: 30000, // Increased patience
+            maxVisibleQueueSize: 5,
+            customerSpawnInterval: 13000, // Slightly increased spawn interval
+            customerSpawnTimerId: null,
+            gameSpeedMultiplier: 1,
+            isPaused: false,
+            timeToNextSpawn: 0, // For pause/resume of spawner
+            lastSpawnTime: 0, // For pause/resume of spawner
+            customerCharacters: ['😀', '😃', '😄', '😁', '😊', '🙂', '😎', '🥸', '🧐', '🤠'],
+            currentAssembly: { hasMeat: false, meat_id: null, toppings: [] },
+            availableToppings: [
+                 { id: 'tomatoes', name: 'Tomatoes', icon: '🍅' },
+                { id: 'onions', name: 'Onions', icon: '🧅' }, { id: 'pickles', name: 'Pickles', icon: '🥒' },
+                { id: 'hummus', name: 'Hummus', icon: '🥣' }, { id: 'garlic_sauce', name: 'Garlic Sauce', icon: '🧄' },
+                { id: 'hot_sauce', name: 'Hot Sauce', icon: '🌶️' }
+            ],
+            ordersServed: 0, gameInProgress: false, score: 0,
+            isShaverDragging: false, shaverStartY: 0, shaverMinY: 8, shaverMaxY: 230,
+            meatOnPlatePortions: [], maxPlateCapacity: 5, nextMeatPortionId: 0,
+        };
+
+        // DOM Elements
+        let meatStackEl, addMeatButton, cookMeatButton, cookingProgressBarContainer, cookingProgressBar,
+            shavedMeatDisplay, toppingsGridDiv, currentShawarmaDiv, serveButton,
+            messageBox, meatShaverEl, spitInteractionAreaEl, meatCollectionPlateEl,
+            plateInfoTextEl, customerQueueDisplayEl, gameOverModalEl, finalScoreTextEl, restartGameButtonEl,
+            pauseButtonEl, pauseOverlayEl;
+
+        function showMessage(text, type = 'success', duration = 2000) {
+            if (!messageBox) { console.error("showMessage: messageBox element not found."); return; }
+            messageBox.textContent = text;
+            messageBox.className = 'message-box';
+            if (type === 'error') { messageBox.classList.add('error'); }
+            messageBox.classList.add('show');
+            setTimeout(() => { messageBox.classList.remove('show'); }, duration);
+        }
+
+        function updateMeatStackVisuals() {
+            if (!meatStackEl || !spitInteractionAreaEl || !meatShaverEl) { return; }
+            meatStackEl.style.height = `${gameState.meatLevel}%`;
+            meatStackEl.classList.remove('cooked', 'cooking');
+            if (gameState.isCooking) {
+                meatStackEl.classList.add('cooking');
+                const progress = gameState.cookingProgress / 100;
+                const rawHue = 20, rawSat = 25, rawLight = 50;
+                const cookedHue = 25, cookedSat = 70, cookedLight = 40;
+                const currentHue = rawHue + (cookedHue - rawHue) * progress;
+                const currentSat = rawSat + (cookedSat - rawSat) * progress;
+                const currentLight = rawLight - (rawLight - cookedLight) * progress;
+                meatStackEl.style.background = `hsl(${currentHue}, ${currentSat}%, ${currentLight}%)`;
+            } else if (gameState.isCooked && gameState.meatLevel > 0) {
+                meatStackEl.classList.add('cooked');
+                meatStackEl.style.background = '';
+            } else if (gameState.meatLevel > 0) {
+                meatStackEl.style.background = 'linear-gradient(to bottom, #a1887f 20%, #795548 80%)';
+            } else {
+                meatStackEl.style.background = 'transparent';
+            }
+            const spitAreaHeight = spitInteractionAreaEl.clientHeight;
+            if (spitAreaHeight > 0 && meatShaverEl.offsetHeight > 0) {
+                gameState.shaverMaxY = spitAreaHeight - meatShaverEl.offsetHeight - 5;
+                if (gameState.meatLevel === 0) gameState.shaverMaxY = gameState.shaverMinY;
+                else gameState.shaverMaxY = Math.max(gameState.shaverMinY, spitAreaHeight - meatShaverEl.offsetHeight - 5);
+            } else { gameState.shaverMaxY = 230; }
+        }
+
+        function startCookingProcess(resume = false) {
+            if (!cookMeatButton || !cookingProgressBarContainer || !cookingProgressBar) { return; }
+            gameState.isCooking = true;
+            if (!resume) {
+                gameState.cookingProgress = 0;
+                gameState.cookingTimeElapsedBeforePause = 0;
+            }
+            gameState.cookingStartTime = Date.now();
+            cookMeatButton.disabled = true;
+            cookMeatButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cooking';
+            cookingProgressBarContainer.style.display = 'block';
+            cookingProgressBar.style.width = `${gameState.cookingProgress}%`;
+            updateMeatStackVisuals();
+            if (gameState.cookingInterval) clearInterval(gameState.cookingInterval);
+            gameState.cookingInterval = setInterval(() => {
+                if (gameState.isPaused) return;
+                const currentTime = Date.now();
+                const timeSinceLastTick = currentTime - gameState.cookingStartTime;
+                gameState.cookingStartTime = currentTime;
+                gameState.cookingTimeElapsedBeforePause += timeSinceLastTick;
+                gameState.cookingProgress = (gameState.cookingTimeElapsedBeforePause / gameState.cookTime) * 100;
+                cookingProgressBar.style.width = `${Math.min(100, gameState.cookingProgress)}%`;
+                updateMeatStackVisuals();
+                if (gameState.cookingProgress >= 100) {
+                    clearInterval(gameState.cookingInterval);
+                    gameState.cookingInterval = null;
+                    gameState.isCooking = false;
+                    gameState.isCooked = true;
+                    gameState.meatShavedThisCycle = 0;
+                    gameState.cookingTimeElapsedBeforePause = 0;
+                    cookMeatButton.disabled = false;
+                    cookMeatButton.innerHTML = '<i class="fas fa-fire"></i> Cook Layer';
+                    cookingProgressBarContainer.style.display = 'none';
+                    cookingProgressBar.style.width = '0%';
+                    updateMeatStackVisuals();
+                    showMessage('Meat layer is cooked!', 'success', 600);
+                }
+            }, 100);
+        }
+
+        function updatePlateVisuals() {
+            if (!meatCollectionPlateEl || !plateInfoTextEl) { return; }
+            const existingPortions = meatCollectionPlateEl.querySelectorAll('.plate-meat-portion');
+            existingPortions.forEach(p => p.remove());
+            gameState.meatOnPlatePortions.forEach(portionId => {
+                const portionEl = document.createElement('div');
+                portionEl.addEventListener('click', () => {
+                    if (!gameState.currentAssembly.hasMeat) {
+                        gameState.currentAssembly.hasMeat = true;
+                        gameState.currentAssembly.meat_id = portionId;
+                        const portionIndex = gameState.meatOnPlatePortions.indexOf(portionId);
+                        if (portionIndex > -1) gameState.meatOnPlatePortions.splice(portionIndex, 1);
+                        updatePlateVisuals();
+                        updateCurrentShawarmaDisplay();
+                        showMessage('Meat added!', 'success', 800);
+                    } else {
+                        showMessage('Already added meat!', 'info', 800);
+                    }
+                });
+                portionEl.classList.add('plate-meat-portion');
+                portionEl.textContent = '🍖';
+                portionEl.draggable = true;
+                portionEl.dataset.portionId = portionId;
+                portionEl.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'meat_portion', id: portionId }));
+                    e.dataTransfer.effectAllowed = 'move';
+                    setTimeout(() => { portionEl.style.opacity = '0.5'; }, 0);
+                });
+                portionEl.addEventListener('dragend', () => { portionEl.style.opacity = '1'; });
+                meatCollectionPlateEl.insertBefore(portionEl, plateInfoTextEl);
+            });
+            if (gameState.meatOnPlatePortions.length === 0) {
+                plateInfoTextEl.textContent = 'Plate Empty';
+                plateInfoTextEl.style.display = 'block';
+            } else if (gameState.meatOnPlatePortions.length >= gameState.maxPlateCapacity) {
+                plateInfoTextEl.textContent = 'Plate Full!';
+                plateInfoTextEl.style.display = 'block';
+            } else {
+                plateInfoTextEl.style.display = 'none';
+            }
+        }
+
+        function resetCurrentAssembly() {
+            gameState.currentAssembly.hasMeat = false;
+            gameState.currentAssembly.meat_id = null;
+            gameState.currentAssembly.toppings = [];
+        }
+
+        function createCustomerElement(customer, isActive = false) {
+            const slotClass = isActive ? 'active-customer-slot' : 'waiting-customer-slot';
+            const customerSlot = document.createElement('div');
+            customerSlot.classList.add(slotClass);
+            customerSlot.id = `customer-${customer.id}`;
+
+            const characterEl = document.createElement('div');
+            characterEl.classList.add('customer-character');
+            characterEl.textContent = customer.character;
+
+            const patienceContainer = document.createElement('div');
+            patienceContainer.classList.add('patience-bar-container');
+            const patienceBar = document.createElement('div');
+            patienceBar.classList.add('patience-bar');
+            patienceBar.id = `patience-${customer.id}`;
+            patienceBar.style.width = `${(customer.patienceLeft / gameState.customerDefaultPatience) * 100}%`;
+            patienceContainer.appendChild(patienceBar);
+            characterEl.appendChild(patienceContainer);
+
+            if (isActive) {
+                const bubbleEl = document.createElement('div');
+                bubbleEl.classList.add('speech-bubble');
+                bubbleEl.id = `bubble-${customer.id}`;
+                if (customer.order.meatRequired) { // Ensure meat is always part of the order object
+                    const meatEmoji = document.createElement('span');
+                    meatEmoji.classList.add('order-emoji');
+                    meatEmoji.textContent = '🍖';
+                    bubbleEl.appendChild(meatEmoji);
+                }
+                customer.order.toppings.forEach(toppingId => {
+                    const topping = gameState.availableToppings.find(t => t.id === toppingId);
+                    if (topping) {
+                        const toppingEmoji = document.createElement('span');
+                        toppingEmoji.classList.add('order-emoji');
+                        toppingEmoji.textContent = topping.icon;
+                        bubbleEl.appendChild(toppingEmoji);
+                    }
+                });
+                bubbleEl.style.display = 'flex';
+                characterEl.appendChild(bubbleEl); // Append bubble as child of character for correct relative positioning
+            }
+            customerSlot.appendChild(characterEl);
+            return customerSlot;
+        }
+
+        function renderCustomerQueue() {
+            if (!customerQueueDisplayEl) { console.error("renderCustomerQueue: customerQueueDisplayEl not found."); return; }
+            customerQueueDisplayEl.innerHTML = '';
+            if (gameState.customerQueue.length === 0 && gameState.gameInProgress) {
+                customerQueueDisplayEl.innerHTML = '<p class="text-gray-500 text-center p-4 text-sm">Waiting for customers...</p>';
+                return;
+            }
+            gameState.customerQueue.slice(0, gameState.maxVisibleQueueSize).forEach((customer, index) => {
+                const isActive = index === 0;
+                const customerEl = createCustomerElement(customer, isActive);
+                customerQueueDisplayEl.appendChild(customerEl);
+            });
+        }
+
+        function startPatienceTimer(customer, resume = false) {
+            if (customer.patienceTimerId) clearInterval(customer.patienceTimerId);
+            if (!resume) { /* patienceLeft is set on creation */ }
+            customer.lastPatienceTick = Date.now();
+            customer.patienceTimerId = setInterval(() => {
+                if (gameState.isPaused || !customer) return;
+                const currentTime = Date.now();
+                const elapsed = currentTime - customer.lastPatienceTick;
+                customer.lastPatienceTick = currentTime;
+                customer.patienceLeft -= elapsed;
+                const patienceBarEl = document.getElementById(`patience-${customer.id}`);
+                if (patienceBarEl) {
+                    const percentage = Math.max(0, (customer.patienceLeft / gameState.customerDefaultPatience) * 100);
+                    patienceBarEl.style.width = `${percentage}%`;
+                    if (percentage < 30) patienceBarEl.style.backgroundColor = '#f44336';
+                    else if (percentage < 60) patienceBarEl.style.backgroundColor = '#ffeb3b';
+                    else patienceBarEl.style.backgroundColor = '#4CAF50';
+                }
+                if (customer.patienceLeft <= 0) {
+                    clearInterval(customer.patienceTimerId);
+                    customer.patienceTimerId = null;
+                    handleCustomerLeaves(customer.id);
+                }
+            }, 100);
+        }
+
+        function handleCustomerLeaves(customerId) {
+            const customerIndex = gameState.customerQueue.findIndex(c => c.id === customerId);
+            if (customerIndex > -1) {
+                if (gameState.customerQueue[customerIndex].patienceTimerId) {
+                    clearInterval(gameState.customerQueue[customerIndex].patienceTimerId);
+                }
+                gameState.customerQueue.splice(customerIndex, 1);
+                gameState.customersLost++;
+                showMessage('A customer left! 😠', 'error');
+                renderCustomerQueue();
+                checkGameOver();
+                if (customerIndex === 0 && gameState.customerQueue.length > 0) {
+                    processNextCustomerInLine();
+                } else if (gameState.customerQueue.length === 0 && gameState.gameInProgress) {
+                    if (customerQueueDisplayEl) customerQueueDisplayEl.innerHTML = '<p class="text-gray-500 text-center p-4 text-sm">Waiting for customers...</p>';
+                }
+            }
+        }
+
+        function processNextCustomerInLine() {
+            resetCurrentAssembly();
+            updateCurrentShawarmaDisplay();
+            renderCustomerQueue();
+        }
+        // 🔁 Fixed 20 Meat-Based Orders (Global Scope)
+        const fixedOrders = [
+            { meatRequired: true, toppings: [] }, // 1. The Purest
+            { meatRequired: true, toppings: ['tomatoes'] },
+            { meatRequired: true, toppings: ['onions'] },
+            { meatRequired: true, toppings: ['pickles'] },
+            { meatRequired: true, toppings: ['hummus'] },
+            { meatRequired: true, toppings: ['garlic_sauce'] },
+            { meatRequired: true, toppings: ['hot_sauce'] },
+        ];
+        let orderIndex = 0;
+
+        // 👥 Add Customers with Increasing Speed
+        function addCustomerToQueue() {
+            if (!gameState.gameInProgress || gameState.customerQueue.length >= gameState.maxVisibleQueueSize + 2) {
+                return;
+            }
+
+            const character = gameState.customerCharacters[Math.floor(Math.random() * gameState.customerCharacters.length)];
+            const order = fixedOrders[orderIndex % fixedOrders.length];
+            orderIndex++;
+
+            const newCustomer = {
+                id: `cust-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                character: character,
+                order: order,
+                patienceLeft: gameState.customerDefaultPatience,
+                patienceTimerId: null
+            };
+
+            gameState.customerQueue.push(newCustomer);
+            startPatienceTimer(newCustomer);
+            renderCustomerQueue();
+
+            // 💨 Speed up spawn rate slightly (capped)
+            if (gameState.gameSpeedMultiplier < 5) {
+                gameState.gameSpeedMultiplier += 0.2;
+            }
+            // 🔁 Restart spawner to apply new speed
+            startCustomerSpawner();
+        }
+
+
+
+        function startCustomerSpawner(resume = false) {
+            if (gameState.customerSpawnTimerId) clearInterval(gameState.customerSpawnTimerId);
+            let interval = gameState.customerSpawnInterval / gameState.gameSpeedMultiplier;
+            if (resume && gameState.timeToNextSpawn > 0) {
+                interval = gameState.timeToNextSpawn;
+                gameState.timeToNextSpawn = 0;
+                if (interval <= 100) {
+                    addCustomerToQueue();
+                    interval = gameState.customerSpawnInterval / gameState.gameSpeedMultiplier;
+                }
+            }
+            gameState.lastSpawnTime = Date.now();
+            gameState.customerSpawnTimerId = setInterval(() => {
+                if (gameState.isPaused) return;
+                addCustomerToQueue();
+                gameState.lastSpawnTime = Date.now();
+            }, interval);
+        }
+        function stopCustomerSpawner() {
+            if (gameState.customerSpawnTimerId) {
+                clearInterval(gameState.customerSpawnTimerId);
+                const timeElapsedSinceLastSpawn = Date.now() - (gameState.lastSpawnTime || Date.now());
+                const currentInterval = gameState.customerSpawnInterval / gameState.gameSpeedMultiplier;
+                gameState.timeToNextSpawn = Math.max(0, currentInterval - timeElapsedSinceLastSpawn);
+                gameState.customerSpawnTimerId = null;
+            }
+        }
+
+        function checkGameOver() {
+            if (gameState.customersLost >= gameState.maxCustomersLost) {
+                gameState.gameInProgress = false;
+                stopCustomerSpawner();
+                gameState.customerQueue.forEach(c => { if (c.patienceTimerId) clearInterval(c.patienceTimerId); });
+                if (finalScoreTextEl) finalScoreTextEl.textContent = `You served ${gameState.ordersServed} customers! Final Score: ${gameState.score}`;
+                if (gameOverModalEl) gameOverModalEl.style.display = 'flex';
+                showMessage('GAME OVER!', 'error', 5000);
+            }
+        }
+
+        function renderToppings() {
+            if (!toppingsGridDiv) { console.error("renderToppings: toppingsGridDiv element not found."); return; }
+            toppingsGridDiv.innerHTML = '';
+            gameState.availableToppings.forEach(topping => {
+                const el = document.createElement('div');
+                el.classList.add('topping-item');
+                el.dataset.toppingId = topping.id;
+                el.draggable = true;
+                el.innerHTML = `<span class="emoji">${topping.icon}</span><span class="topping-name">${topping.name}</span>`;
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'topping', details: topping }));
+                    e.dataTransfer.effectAllowed = 'move';
+                    setTimeout(() => { el.style.opacity = '0.6'; }, 0);
+                });
+                el.addEventListener('dragend', () => { el.style.opacity = '1'; });
+                el.addEventListener('click', () => {
+                    const toppingExists = gameState.currentAssembly.toppings.some(t => t.id === topping.id);
+                    if (!toppingExists) gameState.currentAssembly.toppings.push(topping);
+                    else gameState.currentAssembly.toppings = gameState.currentAssembly.toppings.filter(t => t.id !== topping.id);
+                    updateCurrentShawarmaDisplay();
+                });
+                toppingsGridDiv.appendChild(el);
+            });
+        }
+
+        function updateCurrentShawarmaDisplay() {
+            if (!currentShawarmaDiv) { console.error("updateCurrentShawarmaDisplay: currentShawarmaDiv element not found."); return; }
+            let content = "";
+            if (gameState.currentAssembly.hasMeat) {
+                content += `<span class="assembled-item"><span class="emoji">🍖</span> Meat</span>`;
+            }
+            gameState.currentAssembly.toppings.forEach(topping => {
+                content += `<span class="assembled-item"><span class="emoji">${topping.icon}</span></span>`;
+            });
+            const placeholderEl = document.getElementById('plate-placeholder-text');
+            if (content) {
+                currentShawarmaDiv.innerHTML = content;
+            } else {
+                currentShawarmaDiv.innerHTML = '';
+                if (placeholderEl) {
+                    currentShawarmaDiv.appendChild(placeholderEl);
+                    placeholderEl.style.display = 'block';
+                } else {
+                    const p = document.createElement('p');
+                    p.className = "text-gray-400 text-xs p-1"; p.id = "plate-placeholder-text";
+                    p.textContent = "Drag items here..."; currentShawarmaDiv.appendChild(p);
+                }
+            }
+        }
+
+        function togglePauseGame() {
+            gameState.isPaused = !gameState.isPaused;
+            if (gameState.isPaused) {
+                if (gameState.isCooking && gameState.cookingInterval) {
+                    clearInterval(gameState.cookingInterval);
+                }
+                gameState.customerQueue.forEach(customer => {
+                    if (customer.patienceTimerId) {
+                        clearInterval(customer.patienceTimerId);
+                    }
+                });
+                stopCustomerSpawner();
+                if (pauseOverlayEl) pauseOverlayEl.style.display = 'flex';
+                if (pauseButtonEl) pauseButtonEl.innerHTML = '<i class="fas fa-play"></i> Resume';
+                showMessage('Game Paused', 'info', 100000);
+            } else {
+                if (gameState.isCooking) {
+                    startCookingProcess(true);
+                }
+                gameState.customerQueue.forEach(customer => {
+                    startPatienceTimer(customer, true);
+                });
+                startCustomerSpawner(true);
+                if (pauseOverlayEl) pauseOverlayEl.style.display = 'none';
+                if (pauseButtonEl) pauseButtonEl.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                messageBox.classList.remove('show');
+            }
+        }
+
+        function startGame() {
+            if (gameState.gameInProgress && gameState.ordersServed > 0 && gameState.customersLost < gameState.maxCustomersLost && !gameState.isPaused) return;
+            gameState.isPaused = false;
+            if (pauseOverlayEl) pauseOverlayEl.style.display = 'none';
+            if (pauseButtonEl) pauseButtonEl.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            gameState.gameInProgress = true;
+            if (gameState.cookingInterval) clearInterval(gameState.cookingInterval);
+            gameState.isCooking = false; gameState.cookingProgress = 0; gameState.cookingTimeElapsedBeforePause = 0;
+            if (cookMeatButton) { cookMeatButton.disabled = false; cookMeatButton.innerHTML = '<i class="fas fa-fire"></i> Cook Layer'; }
+            if (cookingProgressBarContainer) cookingProgressBarContainer.style.display = 'none';
+            if (cookingProgressBar) cookingProgressBar.style.width = '0%';
+            if (gameOverModalEl) gameOverModalEl.style.display = 'none';
+            gameState.meatLevel = 70; gameState.isCooked = false;
+            gameState.shavedMeatStock = 0; gameState.meatShavedThisCycle = 0;
+            gameState.ordersServed = 0; gameState.score = 0;
+            gameState.customersLost = 0;
+            gameState.customerQueue.forEach(c => { if (c.patienceTimerId) clearInterval(c.patienceTimerId); });
+            gameState.customerQueue = [];
+            gameState.gameSpeedMultiplier = 1;
+            gameState.meatOnPlatePortions = []; gameState.nextMeatPortionId = 0;
+            gameState.timeToNextSpawn = 0;
+            resetCurrentAssembly();
+            updateMeatStackVisuals();
+            if (shavedMeatDisplay) shavedMeatDisplay.textContent = `Total Meat Stock: ${gameState.shavedMeatStock}g`;
+            updatePlateVisuals();
+            renderToppings();
+            addCustomerToQueue();
+            if (gameState.customerQueue.length < gameState.maxVisibleQueueSize && Math.random() > 0.4) {
+                setTimeout(addCustomerToQueue, 1500 + Math.random() * 1000);
+            }
+            startCustomerSpawner();
+            renderCustomerQueue();
+            showMessage('Restaurant Open!', 'success', 2500);
+        }
+
+        window.onload = () => {
+            meatStackEl = document.getElementById('meat-stack');
+            addMeatButton = document.getElementById('addMeatButton');
+            cookMeatButton = document.getElementById('cookMeatButton');
+            cookingProgressBarContainer = document.getElementById('cooking-progress-bar-container');
+            cookingProgressBar = document.getElementById('cooking-progress-bar');
+            shavedMeatDisplay = document.getElementById('shaved-meat-display');
+            toppingsGridDiv = document.getElementById('toppingsGrid');
+            currentShawarmaDiv = document.getElementById('currentShawarma');
+            serveButton = document.getElementById('serveButton');
+            messageBox = document.getElementById('messageBox');
+            meatShaverEl = document.getElementById('meat-shaver');
+            spitInteractionAreaEl = document.getElementById('shawarma-spit-interaction-area');
+            meatCollectionPlateEl = document.getElementById('meat-collection-plate');
+            plateInfoTextEl = document.getElementById('plate-info-text');
+            customerQueueDisplayEl = document.getElementById('customer-queue-display');
+            gameOverModalEl = document.getElementById('game-over-modal');
+            finalScoreTextEl = document.getElementById('finalScoreText');
+            restartGameButtonEl = document.getElementById('restartGameButton');
+            pauseButtonEl = document.getElementById('pauseButton');
+            pauseOverlayEl = document.getElementById('pauseOverlay');
+
+            const criticalElements = {
+                meatStackEl, addMeatButton, cookMeatButton, cookingProgressBarContainer, cookingProgressBar,
+                shavedMeatDisplay, toppingsGridDiv, currentShawarmaDiv, serveButton, messageBox,
+                meatShaverEl, spitInteractionAreaEl, meatCollectionPlateEl, plateInfoTextEl,
+                customerQueueDisplayEl, gameOverModalEl, finalScoreTextEl, restartGameButtonEl,
+                pauseButtonEl, pauseOverlayEl
+            };
+            let allFound = true;
+            for (const key in criticalElements) {
+                if (!criticalElements[key]) {
+                    console.error(`FATAL ERROR: DOM Element "${key}" (id: ${key}) not found. Check ID in HTML.`);
+                    allFound = false;
+                }
+            }
+            if (!allFound) {
+                alert("FATAL ERROR: One or more critical game elements are missing. Game cannot start. Check console.");
+                return;
+            }
+
+            addMeatButton.addEventListener('click', () => {
+                if (gameState.isCooking) { showMessage("Cannot add meat while cooking!", "error"); return; }
+                if (!gameState.gameInProgress) startGame();
+                if (gameState.meatLevel < gameState.maxMeatLevel) {
+                    gameState.meatLevel += gameState.meatIncrement;
+                    if (gameState.meatLevel > gameState.maxMeatLevel) gameState.meatLevel = gameState.maxMeatLevel;
+                    gameState.isCooked = false; gameState.meatShavedThisCycle = 0;
+                    updateMeatStackVisuals(); showMessage('Added raw meat!', 'success');
+                } else { showMessage('Spit is full!', 'error'); }
+            });
+            cookMeatButton.addEventListener('click', () => {
+                if (!gameState.gameInProgress) startGame();
+                if (gameState.isCooking) { showMessage('Already cooking!', 'info'); return; }
+                if (gameState.meatLevel === 0) { showMessage('No meat to cook!', 'error'); return; }
+                if (gameState.isCooked) { showMessage('Current layer is already cooked!', 'info'); return; }
+                startCookingProcess();
+            });
+            meatShaverEl.addEventListener('mousedown', (e) => {
+                if (gameState.isCooking) { showMessage("Cannot shave while cooking!", "error"); return; }
+                if (!gameState.isCooked) { showMessage('Meat layer is not cooked!', 'error'); return; }
+                if (gameState.meatLevel === 0) { showMessage('No meat on spit!', 'error'); return; }
+                if (gameState.meatOnPlatePortions.length >= gameState.maxPlateCapacity) { showMessage('Plate is full!', 'error'); return; }
+                gameState.isShaverDragging = true;
+                gameState.shaverStartY = e.clientY - meatShaverEl.getBoundingClientRect().top;
+                meatShaverEl.style.cursor = 'grabbing'; document.body.style.userSelect = 'none';
+            });
+            meatShaverEl.addEventListener('click', () => {
+                if (gameState.isCooking) { showMessage("Cannot shave while cooking!", "error", 800); return; }
+                if (!gameState.isCooked) { showMessage('Meat layer is not cooked!', 'error', 800); return; }
+                if (gameState.meatLevel === 0) { showMessage('No meat on spit!', 'error', 800); return; }
+                if (gameState.meatOnPlatePortions.length >= gameState.maxPlateCapacity) { showMessage('Plate is full!', 'error', 800); return; }
+
+                gameState.shavedMeatStock += gameState.shaveAmount;
+                gameState.meatShavedThisCycle += gameState.shaveAmount;
+                const newPortionId = `meat_${gameState.nextMeatPortionId++}`;
+                gameState.meatOnPlatePortions.push(newPortionId);
+                if (shavedMeatDisplay) shavedMeatDisplay.textContent = `Total Meat Stock: ${gameState.shavedMeatStock}g`;
+                updatePlateVisuals();
+                const reduction = gameState.meatIncrement * (gameState.shaveAmount / gameState.meatCapacityPerCookCycle) * 0.3;
+                gameState.meatLevel -= reduction;
+                if (gameState.meatLevel < 0) gameState.meatLevel = 0;
+                if (gameState.meatShavedThisCycle >= gameState.meatCapacityPerCookCycle) {
+                    gameState.isCooked = false;
+                    showMessage('Cooked layer used up! Cook again.', 'info', 800);
+                } else {
+                    showMessage(`+${gameState.shaveAmount}g meat on plate!`, 'success', 800);
+                }
+                if (gameState.meatLevel === 0) gameState.isCooked = false;
+                updateMeatStackVisuals();
+            });
+            meatShaverEl.addEventListener('dragstart', (e) => e.preventDefault());
+            document.addEventListener('mousemove', (e) => {
+                if (!gameState.isShaverDragging) return;
+                if (!spitInteractionAreaEl || !meatShaverEl) return;
+                const spitRect = spitInteractionAreaEl.getBoundingClientRect();
+                let newTop = e.clientY - spitRect.top - gameState.shaverStartY;
+                newTop = Math.max(gameState.shaverMinY, newTop);
+                newTop = Math.min(gameState.shaverMaxY, newTop);
+                meatShaverEl.style.top = `${newTop}px`;
+            });
+            document.addEventListener('mouseup', () => {
+                if (!gameState.isShaverDragging) return;
+                gameState.isShaverDragging = false;
+                if (!meatShaverEl || !spitInteractionAreaEl) return;
+                meatShaverEl.style.cursor = 'grab'; document.body.style.userSelect = 'auto';
+                const currentShaverTop = meatShaverEl.offsetTop;
+                const dragDistance = currentShaverTop - gameState.shaverMinY;
+                const meatPxHeight = (gameState.meatLevel / 100) * spitInteractionAreaEl.clientHeight * 0.7;
+                const requiredDragDistance = Math.max(meatPxHeight * 0.5, 30);
+                if (dragDistance >= requiredDragDistance && gameState.isCooked && gameState.meatLevel > 0 && gameState.meatOnPlatePortions.length < gameState.maxPlateCapacity) {
+                    gameState.shavedMeatStock += gameState.shaveAmount;
+                    gameState.meatShavedThisCycle += gameState.shaveAmount;
+                    const newPortionId = `meat_${gameState.nextMeatPortionId++}`;
+                    gameState.meatOnPlatePortions.push(newPortionId);
+                    if (shavedMeatDisplay) shavedMeatDisplay.textContent = `Total Meat Stock: ${gameState.shavedMeatStock}g`;
+                    updatePlateVisuals();
+                    const reduction = gameState.meatIncrement * (gameState.shaveAmount / gameState.meatCapacityPerCookCycle) * 0.3;
+                    gameState.meatLevel -= reduction;
+                    if (gameState.meatLevel < 0) gameState.meatLevel = 0;
+                    if (gameState.meatShavedThisCycle >= gameState.meatCapacityPerCookCycle) {
+                        gameState.isCooked = false;
+                        showMessage('Cooked layer used up! Cook again.', 'info');
+                    } else {
+                        showMessage(`+${gameState.shaveAmount}g meat on plate!`, 'success');
+                    }
+                    if (gameState.meatLevel === 0) gameState.isCooked = false;
+                    updateMeatStackVisuals();
+                }
+                meatShaverEl.style.transition = 'top 0.2s ease-out';
+                meatShaverEl.style.top = `${gameState.shaverMinY}px`;
+                setTimeout(() => { if (meatShaverEl) meatShaverEl.style.transition = ''; }, 200);
+            });
+            currentShawarmaDiv.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+            currentShawarmaDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const dataString = e.dataTransfer.getData('text/plain');
+                try {
+                    const data = JSON.parse(dataString);
+                    if (data.type === 'meat_portion') {
+                        if (!gameState.currentAssembly.hasMeat) {
+                            gameState.currentAssembly.hasMeat = true;
+                            gameState.currentAssembly.meat_id = data.id;
+                            const portionIndex = gameState.meatOnPlatePortions.indexOf(data.id);
+                            if (portionIndex > -1) gameState.meatOnPlatePortions.splice(portionIndex, 1);
+                            updatePlateVisuals(); 
+                            updateCurrentShawarmaDisplay(); 
+                            showMessage('Meat added!', 'success');
+                        } else { showMessage('Meat already added!', 'error'); }
+                    } else if (data.type === 'topping') {
+                        const toppingExists = gameState.currentAssembly.toppings.some(t => t.id === data.details.id);
+                        if (!toppingExists) {
+                            gameState.currentAssembly.toppings.push(data.details);
+                            updateCurrentShawarmaDisplay(); showMessage(`${data.details.name} added!`, 'success');
+                        } else { showMessage(`${data.details.name} already added!`, 'info'); }
+                    }
+                } catch (error) { console.error("Error parsing dropped data:", error, dataString); showMessage("Oops! Something went wrong.", "error"); }
+            });
+            serveButton.addEventListener('click', () => {
+                if (!gameState.gameInProgress || gameState.customerQueue.length === 0) { showMessage('No customer to serve!', 'error'); return; }
+                const activeCustomer = gameState.customerQueue[0];
+                //if (activeCustomer.order.meatRequired && !gameState.currentAssembly.hasMeat) { showMessage('Needs meat!', 'error'); return; }
+                let correct = true;
+                const assembledToppingIds = gameState.currentAssembly.toppings.map(t => t.id);
+                const orderToppingIds = activeCustomer.order.toppings;
+                if (assembledToppingIds.length !== orderToppingIds.length) correct = false;
+                else { for (const tId of orderToppingIds) { if (!assembledToppingIds.includes(tId)) { correct = false; break; } } }
+                if (correct) {
+                    const pts = 10 + (orderToppingIds.length * 5); gameState.score += pts;
+                    showMessage(`Order Up! +${pts} pts! (Total: ${gameState.score})`, 'success');
+                    gameState.ordersServed++;
+                    clearInterval(activeCustomer.patienceTimerId);
+                    gameState.customerQueue.shift();
+                    renderCustomerQueue();
+                    if (gameState.customerQueue.length > 0) { processNextCustomerInLine(); }
+                    else if (gameState.gameInProgress) {
+                        if (customerQueueDisplayEl) customerQueueDisplayEl.innerHTML = '<p class="text-gray-500 text-center p-4 text-sm">Waiting for customers...</p>';
+                    }
+                } else { showMessage('Incorrect order!', 'error'); }
+                resetCurrentAssembly();
+                updateCurrentShawarmaDisplay();
+            });
+            restartGameButtonEl.addEventListener('click', startGame);
+            pauseButtonEl.addEventListener('click', togglePauseGame);
+
+            updateMeatStackVisuals();
+            if (plateInfoTextEl) plateInfoTextEl.textContent = 'Plate Empty';
+            startGame();
+            setTimeout(updateMeatStackVisuals, 150);
+        };
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(err => {
+                console.log('Orientation lock failed:', err);
+            });
+        }
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                location.reload();
+            }, 500); // reload after rotation to reset layout
+        });
+
+    </script>
+</body>
+
+</html>

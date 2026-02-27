@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/staticwebapp.config.json",
+  "navigationFallback": {
+    "rewrite": "/cooking_game.html"
+  },
+  "routes": [
+    { "route": "/", "rewrite": "/cooking_game.html" }
+  ],
+  "globalHeaders": {
+    "Cache-Control": "public, max-age=3600"
+  }
+}
